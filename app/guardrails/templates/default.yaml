@@ -1,0 +1,47 @@
+input_validation:
+  max_length: 32000
+  min_length: 1
+  strip_html: true
+  check_encoding: true
+
+jailbreak_detection:
+  enabled: true
+  patterns:
+    - "ignore (all |previous |above )?instructions"
+    - "you are now (DAN|an? AI without restrictions)"
+    - "pretend you (are|have no|can)"
+    - "override your (training|guidelines|restrictions)"
+    - "forget (everything|your training|all instructions)"
+
+toxicity:
+  enabled: true
+  blocked_categories:
+    - hate_speech
+    - violence
+    - self_harm
+    - explicit_content
+
+pii_masking:
+  enabled: true
+  patterns:
+    - name: credit_card
+      pattern: "\\b(?:\\d{4}[\\s-]?){3}\\d{4}\\b"
+      replacement: "[CREDIT_CARD]"
+    - name: ssn
+      pattern: "\\b\\d{3}-\\d{2}-\\d{4}\\b"
+      replacement: "[SSN]"
+    - name: email
+      pattern: "[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}"
+      replacement: "[EMAIL]"
+
+allowed_topics: []
+
+blocked_topics:
+  - weapon_manufacturing
+  - drug_synthesis
+  - illegal_activities
+
+hallucination_reduction:
+  enabled: true
+  require_citations_for_facts: false
+  uncertainty_acknowledgment: true
