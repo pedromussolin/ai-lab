@@ -1,0 +1,59 @@
+{
+  "name": "AI Lab Dev Container",
+  "dockerComposeFile": ["../docker-compose.yml", "docker-compose.extend.yml"],
+  "service": "devcontainer",
+  "workspaceFolder": "/workspace",
+  "shutdownAction": "stopCompose",
+
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-python.debugpy",
+        "charliermarsh.ruff",
+        "ms-python.black-formatter",
+        "ms-toolsai.jupyter",
+        "ms-azuretools.vscode-docker",
+        "redhat.vscode-yaml",
+        "tamasfe.even-better-toml",
+        "bradlc.vscode-tailwindcss",
+        "eamodio.gitlens",
+        "github.copilot",
+        "mtxr.sqltools",
+        "mtxr.sqltools-driver-pg",
+        "humao.rest-client"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.linting.enabled": true,
+        "[python]": {
+          "editor.defaultFormatter": "charliermarsh.ruff",
+          "editor.formatOnSave": true,
+          "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit"
+          }
+        },
+        "ruff.path": ["/usr/local/bin/ruff"],
+        "editor.rulers": [100],
+        "editor.tabSize": 4,
+        "files.trimTrailingWhitespace": true,
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  },
+
+  "postCreateCommand": "bash /workspace/.devcontainer/scripts/setup.sh",
+  "remoteUser": "vscode",
+  "containerEnv": {
+    "PYTHONPATH": "/workspace",
+    "DATABASE_URL": "postgresql+asyncpg://ailab:ailab@db:5432/ailab",
+    "DATABASE_URL_SYNC": "postgresql+psycopg2://ailab:ailab@db:5432/ailab",
+    "REDIS_URL": "redis://redis:6379/0"
+  }
+}

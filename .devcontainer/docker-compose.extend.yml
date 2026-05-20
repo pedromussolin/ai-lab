@@ -1,0 +1,47 @@
+version: '3.9'
+
+services:
+  devcontainer:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    volumes:
+      - ..:/workspace:cached
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://ailab:ailab@db:5432/ailab
+      - DATABASE_URL_SYNC=postgresql+psycopg2://ailab:ailab@db:5432/ailab
+      - REDIS_URL=redis://redis:6379/0
+      - PYTHONPATH=/workspace
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - ai-lab-network
+    command: sleep infinity
+
+  api-dev:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    container_name: ai-lab-api-dev
+    volumes:
+      - ..:/workspace:cached
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://ailab:ailab@db:5432/ailab
+      - DATABASE_URL_SYNC=postgresql+psycopg2://ailab:ailab@db:5432/ailab
+      - REDIS_URL=redis://redis:6379/0
+      - PYTHONPATH=/workspace
+    env_file:
+      - ../.env
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - ai-lab-network
+    working_dir: /workspace
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --reload-dir /workspace/app
