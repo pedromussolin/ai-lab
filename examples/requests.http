@@ -1,0 +1,83 @@
+# AI Lab — HTTP request examples for VS Code REST Client
+# Install the REST Client extension and click "Send Request"
+
+@baseUrl = http://localhost:8000
+@apiKey = your-api-key-here
+
+### Health check
+GET {{baseUrl}}/health
+
+### Chat (non-streaming)
+POST {{baseUrl}}/api/v1/chat
+Content-Type: application/json
+X-API-Key: {{apiKey}}
+
+{
+  "message": "What is the capital of France?",
+  "persona_id": "assistant_default",
+  "provider": "openai",
+  "model": "gpt-4o",
+  "use_rag": false,
+  "tools_enabled": false
+}
+
+### Chat with tools
+POST {{baseUrl}}/api/v1/chat
+Content-Type: application/json
+X-API-Key: {{apiKey}}
+
+{
+  "message": "What is 2 ** 32 and what day is today?",
+  "tools_enabled": true,
+  "use_rag": false
+}
+
+### Chat with streaming
+POST {{baseUrl}}/api/v1/chat/stream
+Content-Type: application/json
+X-API-Key: {{apiKey}}
+
+{
+  "message": "Explain quantum entanglement in simple terms",
+  "persona_id": "researcher",
+  "stream": true
+}
+
+### List conversations
+GET {{baseUrl}}/api/v1/conversations
+X-API-Key: {{apiKey}}
+
+### Create conversation
+POST {{baseUrl}}/api/v1/conversations
+Content-Type: application/json
+X-API-Key: {{apiKey}}
+
+{
+  "title": "My First Conversation",
+  "provider": "openai",
+  "model": "gpt-4o"
+}
+
+### RAG query
+POST {{baseUrl}}/api/v1/rag/query
+Content-Type: application/json
+X-API-Key: {{apiKey}}
+
+{
+  "query": "what does the document say about pricing?",
+  "top_k": 5
+}
+
+### List personas
+GET {{baseUrl}}/api/v1/personas
+X-API-Key: {{apiKey}}
+
+### Validate guardrail
+POST {{baseUrl}}/api/v1/guardrails/validate
+Content-Type: application/json
+X-API-Key: {{apiKey}}
+
+{
+  "text": "How do I bake a chocolate cake?",
+  "config": "default"
+}
