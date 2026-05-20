@@ -1,0 +1,5 @@
+{% for message in history %}
+**{{ message.role | title }}**: {{ message.content }}
+{% endfor %}
+
+**User**: {{ user_message }}

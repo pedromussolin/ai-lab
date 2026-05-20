@@ -1,0 +1,17 @@
+Answer the user's question using the provided context documents.
+
+## Retrieved Context
+{% for doc in context_docs %}
+### Source {{ loop.index }}: {{ doc.source }}
+{{ doc.content }}
+---
+{% endfor %}
+
+## Instructions
+- Answer based on the context above
+- If the context doesn't contain enough information, say so clearly
+- Cite sources as [Source N] when referencing specific information
+- Do not fabricate information not present in the context
+
+## User Question
+{{ user_message }}

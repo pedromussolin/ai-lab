@@ -1,0 +1,12 @@
+## Retrieved Knowledge
+
+{% for doc in documents %}
+### [{{ loop.index }}] {{ doc.source }}
+**Relevance Score**: {{ '%.2f' | format(doc.score) }}
+
+{{ doc.content }}
+
+---
+{% endfor %}
+
+Use the above information to answer the question. Always cite sources using [N] notation.
