@@ -1,0 +1,94 @@
+version: '3.9'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: final
+    container_name: ai-lab-api
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://ailab:ailab@db:5432/ailab
+      - DATABASE_URL_SYNC=postgresql+psycopg2://ailab:ailab@db:5432/ailab
+      - REDIS_URL=redis://redis:6379/0
+      - LOG_LEVEL=INFO
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - ai-lab-network
+    restart: unless-stopped
+    volumes:
+      - ./uploads:/app/uploads
+
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: ai-lab-db
+    environment:
+      POSTGRES_USER: ailab
+      POSTGRES_PASSWORD: ailab
+      POSTGRES_DB: ailab
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ailab -d ailab"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ai-lab-network
+    restart: unless-stopped
+
+  redis:
+    image: redis:7.4-alpine
+    container_name: ai-lab-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ai-lab-network
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: final
+    container_name: ai-lab-migrate
+    command: ["alembic", "upgrade", "head"]
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://ailab:ailab@db:5432/ailab
+      - DATABASE_URL_SYNC=postgresql+psycopg2://ailab:ailab@db:5432/ailab
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - ai-lab-network
+    profiles:
+      - migrate
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  ai-lab-network:
+    driver: bridge
